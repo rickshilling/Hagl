@@ -29,7 +29,7 @@ description:
   .
   For some concrete examples, see the included README.md file, available online
   here: <https://github.com/walkie/Hagl/blob/master/README.md>
-
+  test
 extra-source-files: README.md
 source-repository head
   type:     git
