@@ -45,11 +45,11 @@ data ExecM g a = ExecM  { unE :: StateT (Exec g) IO a }
 --   `MonadIO` for the `IO` monad.
 class (Game g, Monad m, MonadIO m) => GameM m g | m -> g where
   getExec :: m (Exec g)
-
+{-
 -- | Execute a game with some given players, returning the payoff.
 runGame :: (Game g, Eq (Move g)) => g -> [Player g] -> IO Payoff
 runGame g ps = evalGame g ps finish
-
+-}
 -- | Evaluate a command with the given game and players in the game
 --   execution monad, returning the result.
 evalGame :: Game g => g -> [Player g] -> ExecM g a -> IO a
@@ -72,7 +72,7 @@ data StratM s g a = StratM { unS :: StateT s (ExecM g) a }
 
 -- | A strategy is a computation in the strategy monad that produces a move.
 type Strategy s g = StratM s g (Move g)
-
+{-
 -- | Run the strategy associated with a particular player, producing a move
 --   and an updated player state.
 runStrategy :: Player g -> ExecM g (Move g, Player g)
@@ -86,7 +86,7 @@ runStrategy (Player n s f) = do
 -- | Modify a state and return it. Handy in some strategies.
 update :: MonadState s m => (s -> s) -> m s
 update f = modify f >> get
-
+-}
 
 --
 -- * Players
@@ -155,6 +155,7 @@ players = liftM _players getExec
 numPlaying :: GameM m g => m Int
 numPlaying = liftM dlength players
 
+{-
 -- | The index of the currently active player.
 myPlayerID :: GameM m g => m PlayerID
 myPlayerID = do
@@ -338,3 +339,4 @@ instance Game g => GameM (ExecM g) g where
   getExec = ExecM get
 instance Game g => GameM (StratM s g) g where
   getExec = StratM (lift getExec)
+-}
