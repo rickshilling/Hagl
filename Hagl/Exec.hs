@@ -1,3 +1,4 @@
+{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE ExistentialQuantification, 
              FlexibleContexts, 
              FlexibleInstances, 
@@ -69,20 +70,24 @@ execGame g ps f = execStateT (unE f) (initExec g ps)
 --   state of the player who is playing this strategy, and wraps the game
 --   execution monad.  This gives strategies access to the game execution state.
 data StratM s g a = StratM { unS :: StateT s (ExecM g) a }
+-- newType StateT s m a
+--   Constructor
+--        runStateT :: s -> m (a, s)
+--   unS :: s -> (ExecM g) (a, s)
 
 -- | A strategy is a computation in the strategy monad that produces a move.
 type Strategy s g = StratM s g (Move g)
+
 {-
 -- | Run the strategy associated with a particular player, producing a move
 --   and an updated player state.
 runStrategy :: Player g -> ExecM g (Move g, Player g)
-runStrategy p@(n ::: m) = do 
+runStrategy p@(n ::: m) = do
     mv <- evalStateT (unS m) ()
     return (mv, p)
-runStrategy (Player n s f) = do 
+runStrategy (Player n s f) = do
     (mv, s') <- runStateT (unS f) s
     return (mv, Player n s' f)
-
 -- | Modify a state and return it. Handy in some strategies.
 update :: MonadState s m => (s -> s) -> m s
 update f = modify f >> get
@@ -170,7 +175,7 @@ me = liftM2 forPlayer myPlayerID players
 
 
 -- *** About current iteration
-
+-}
 -- | Current location in the game graph.
 location :: GameM m g => m ((TreeType g) (State g) (Move g))
 location = liftM _location getExec
@@ -256,7 +261,7 @@ onlyMove = liftM ((fmap . fmap) (only . everyTurn)) moves
 --
 -- * Executing games
 --
-
+{-
 -- | Process one node in the game tree.
 step :: (Game g, Eq (Move g)) => ExecM g (Maybe Payoff)
 step = location >>= processLocation
@@ -265,7 +270,7 @@ step = location >>= processLocation
       Decision i -> decide i   >>= performMove l
       Chance d   -> fromDist d >>= performMove l
       Payoff p   -> givePayoff p
-    
+
     performMove l m = do
       e <- getExec
       let a = treeAction l
@@ -275,7 +280,7 @@ step = location >>= processLocation
                            _numMoves   = inc a (_numMoves e) }
         Nothing -> fail "step: illegal move!"
       return Nothing
-    
+
     inc (Decision p) ns = setForPlayer p (forPlayer p ns + 1) ns
     inc _            ns = ns
 
@@ -285,7 +290,7 @@ step = location >>= processLocation
       e <- getExec
       put e { _players = setForPlayer i p (_players e) }
       return m
-    
+
     givePayoff p = do
       e <- getExec
       let t = _transcript e
@@ -294,8 +299,8 @@ step = location >>= processLocation
               _history    = addForNewGame (t, (summarize (dlength p) t, Just p)) (_history e),
               _gameNumber = _gameNumber e + 1 }
       return (Just p)
-
-
+-}
+{-
 -- | Run the current game iteration to completion, returning the payoff.
 finish :: (Game g, Eq (Move g)) => ExecM g Payoff
 finish = step >>= maybe finish return
