@@ -39,7 +39,7 @@ import Hagl.History
 
 -- | The game execution monad.  A state monad transformer that maintains the
 --   game execution state.
-data ExecM g a = ExecM  { unE :: StateT (Exec g) IO a }
+data ExecM g a = ExecM  { unE :: StateT (Exec g) IO a } -- (Exec g) -> IO (a, (Exec g))
 
 -- | This type class captures all monads that wrap the game execution monad,
 --   providing uniform access to the game execution state.  It is similar to
@@ -77,7 +77,6 @@ data StratM s g a = StratM { unS :: StateT s (ExecM g) a }
 
 -- | A strategy is a computation in the strategy monad that produces a move.
 type Strategy s g = StratM s g (Move g)
-
 {-
 -- | Run the strategy associated with a particular player, producing a move
 --   and an updated player state.
@@ -88,6 +87,8 @@ runStrategy p@(n ::: m) = do
 runStrategy (Player n s f) = do
     (mv, s') <- runStateT (unS f) s
     return (mv, Player n s' f)
+-}
+{-
 -- | Modify a state and return it. Handy in some strategies.
 update :: MonadState s m => (s -> s) -> m s
 update f = modify f >> get
